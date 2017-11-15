@@ -9,10 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Set;
-
-
 @RestController
 public class CrudController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CrudController.class);
@@ -42,9 +38,13 @@ public class CrudController {
     public Employee addEmployee(@RequestParam("firstName") String firstName,
                                 @RequestParam("lastName") String lastName,
                                 @RequestParam("age") int age) {
-        LOGGER.info("You have added " + firstName + " " + lastName);
         Employee employee = new Employee(getID(), firstName, lastName, age);
-        repository.save(employee);
+        try {
+            repository.save(employee);
+            LOGGER.info("You have added " + firstName + " " + lastName + "ID: " + employee.getUserID() + "\n HTTP_CODE: " + HttpStatus.OK);
+        }catch(Exception e){
+            LOGGER.error("Failed to save " + firstName + " " + lastName + "\n HTTP_CODE " + HttpStatus.BAD_REQUEST);
+        }
         return employee;
     }
 
@@ -70,20 +70,12 @@ public class CrudController {
     }
 
     /**
-     * read all employees in the database
-     * @param firstName
-     * @param lastName
-     * @param age
-     * @return
+     * read all the Employees
+     * @return Employees
      */
     @RequestMapping(value = "/api/read")
     public Iterable<Employee> readAllEmployees() {
-        StringBuilder sb;
         Iterable<Employee> employeesIterable = repository.findAll();
-//
-//        for (Employee employee :employeesIterable) {
-//            sb.append("")
-//        }
         return employeesIterable;
     }
 
@@ -91,11 +83,13 @@ public class CrudController {
                     method = RequestMethod.GET)
     @ResponseBody
     public Employee readEmployeeByID(@PathVariable("userID") Long userID) {
-        Employee employee = new Employee();
+        Employee employee;
         try {
-             employee = repository.findOne(userID);
+            employee = repository.findOne(userID);
+            LOGGER.info("Sucessfully read entry for ID: " + userID);
         }catch(Exception e){
-
+            employee = new Employee();
+            LOGGER.error("Unable to read employee with ID: " + userID);
         }
         return employee;
     }
@@ -107,12 +101,24 @@ public class CrudController {
      * @param age
      * @return
      */
-    @RequestMapping("/api/update/{userID}")
-    public Employee updateEmployeeByID(@RequestParam("userID") long userID,
-                                       @PathVariable("lastName") String firstName,
-                                       @PathVariable("lastName") String lastName,
-                                       @PathVariable("age") int age) {
-        return new Employee(getID(), firstName, lastName, age );
+    @RequestMapping(value = "/api/update/{userID}", params = {"firstName", "lastName", "age"})
+    public Employee updateEmployeeByID(@PathVariable("userID") long userID,
+                                       @RequestParam("firstName") String firstName,
+                                       @RequestParam("lastName") String lastName,
+                                       @RequestParam("age") int age) {
+        Employee employee;
+        try {
+            employee = repository.findOne(userID);
+            employee.setFirstName(firstName);
+            employee.setLastName(lastName);
+            employee.setAge(age);
+            repository.save(employee);
+            LOGGER.info("Employee " + firstName + " " + lastName + "Has been updated");
+        }catch (Exception e){
+            LOGGER.error("The user you're searching for could not be found");
+            employee = new Employee();
+        }
+        return employee;
     }
 
 

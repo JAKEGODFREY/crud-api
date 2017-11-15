@@ -12,7 +12,6 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.AUTO)
 
     private long userID;
-
     private String firstName;
     private String lastName;
     private int age;
@@ -31,6 +30,7 @@ public class Employee {
      */
     public Employee(Long userID, String firstName, String lastName, int age) {
         this.userID = userID;
+
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
@@ -58,6 +58,10 @@ public class Employee {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public long getUserID() {
+        return userID;
     }
 
     public void setUserID(int userID) {
