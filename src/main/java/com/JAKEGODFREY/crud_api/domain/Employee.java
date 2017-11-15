@@ -1,8 +1,18 @@
 package com.JAKEGODFREY.crud_api.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Employee {
 
-    private int userID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+
+    private long userID;
+
     private String firstName;
     private String lastName;
     private int age;
@@ -19,7 +29,7 @@ public class Employee {
      * @param lastName the users last name
      * @param age the users age
      */
-    public Employee(int userID, String firstName, String lastName, int age) {
+    public Employee(Long userID, String firstName, String lastName, int age) {
         this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;
