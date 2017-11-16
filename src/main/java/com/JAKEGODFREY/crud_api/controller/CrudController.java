@@ -41,7 +41,7 @@ public class CrudController {
         Employee employee = new Employee(getID(), firstName, lastName, age);
         try {
             repository.save(employee);
-            LOGGER.info("You have added " + firstName + " " + lastName + "ID: " + employee.getUserID() + "\n HTTP_CODE: " + HttpStatus.OK);
+            LOGGER.info("You have added " + firstName + " " + lastName + " ID: " + employee.getUserID() + "\n HTTP_CODE: " + HttpStatus.OK);
         }catch(Exception e){
             LOGGER.error("Failed to save " + firstName + " " + lastName + "\n HTTP_CODE " + HttpStatus.BAD_REQUEST);
         }
@@ -60,7 +60,7 @@ public class CrudController {
         String response;
         try {
             repository.delete(userID);
-            response = "You have successfuly removed " + userID + ".\n"
+            response = "You have successfully removed " + userID + ".\n"
                     + "HTTP_CODE: "+ HttpStatus.OK;
         } catch(Exception e){
             response = "The user with the ID of " + userID + " could not be found, please try another ID.\n"
@@ -109,13 +109,17 @@ public class CrudController {
         Employee employee;
         try {
             employee = repository.findOne(userID);
-            employee.setFirstName(firstName);
-            employee.setLastName(lastName);
-            employee.setAge(age);
-            repository.save(employee);
-            LOGGER.info("Employee " + firstName + " " + lastName + "Has been updated");
+            if (employee != null) {
+                employee.setFirstName(firstName);
+                employee.setLastName(lastName);
+                employee.setAge(age);
+                repository.save(employee);
+                LOGGER.info("Employee " + firstName + " " + lastName + "Has been updated");
+            }else {
+                LOGGER.error("The ID: " + userID + " doesnt exist");
+            }
         }catch (Exception e){
-            LOGGER.error("The user you're searching for could not be found");
+            LOGGER.error("an error occured with the repo");
             employee = new Employee();
         }
         return employee;
